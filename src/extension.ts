@@ -24,7 +24,13 @@ import { subclass } from "./commands/subclass";
 import { superclass } from "./commands/superclass";
 import { viewOthers } from "./commands/viewOthers";
 import { xml2doc } from "./commands/xml2doc";
-import { mainMenu, contextMenu, documentBeingProcessed, fireOtherStudioAction, OtherStudioAction } from "./commands/studio";
+import { mainMenu,
+  contextMenu,
+  documentBeingProcessed,
+  fireOtherStudioAction,
+  OtherStudioAction,
+  checkIfExtensionEnabled
+} from "./commands/studio";
 
 import { getLanguageConfiguration } from "./languageConfiguration";
 
@@ -150,6 +156,8 @@ export const checkConnection = (clearCookies = false): void => {
     api.clearCookies();
   }
   if (connectionSocket && connectionSocket.url == api.xdebugUrl() && connectionSocket.OPEN) {
+    // Check for studio extension on connection refresh
+    checkIfExtensionEnabled();
     return;
   }
   api
@@ -163,7 +171,9 @@ export const checkConnection = (clearCookies = false): void => {
       /// Use xdebug's websocket, to catch when server disconnected
       connectionSocket = new WebSocket(api.xdebugUrl());
       connectionSocket.onopen = () => {
-        fireOtherStudioAction(OtherStudioAction.ConnectedToNewNamespace);
+        checkIfExtensionEnabled().then(() =>
+          fireOtherStudioAction(OtherStudioAction.ConnectedToNewNamespace)
+        );
         panel.text = `${connInfo} - Connected`;
       };
       connectionSocket.onclose = event => {

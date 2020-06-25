@@ -129,7 +129,7 @@
         },
         {
           "command": "vscode-objectscript.studio.actions",
-          "when": "vscode-objectscript.connectActive && resourceScheme == isfs"
+          "when": "vscode-objectscript.connectActive && resourceScheme == isfs && vscode-objectscript.studioExtensionEnabled"
         }
       ],
       "view/title": [
@@ -158,7 +158,7 @@
         },
         {
           "command": "vscode-objectscript.studio.contextActions",
-          "when": "view == ObjectScriptExplorer && viewItem =~ /^dataNode:/"
+          "when": "view == ObjectScriptExplorer && viewItem =~ /^dataNode:/ && vscode-objectscript.studioExtensionEnabled"
         },
         {
           "command": "vscode-objectscript.explorer.otherNamespace",
@@ -190,7 +190,7 @@
         },
         {
           "command": "vscode-objectscript.studio.actions",
-          "when": "resourceScheme == isfs && editorLangId =~ /^objectscript/ && vscode-objectscript.connectActive"
+          "when": "resourceScheme == isfs && editorLangId =~ /^objectscript/ && vscode-objectscript.connectActive && vscode-objectscript.studioExtensionEnabled"
         },
         {
           "command": "vscode-objectscript.previewXml",

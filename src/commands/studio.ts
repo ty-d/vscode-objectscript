@@ -10,6 +10,7 @@ import { NodeBase } from "../explorer/models/nodeBase";
 import { importAndCompile, loadChanges } from "./compile";
 
 export let documentBeingProcessed: vscode.TextDocument = null;
+export let studioExtensionEnabled: boolean;
 
 export enum OtherStudioAction {
   AttemptedEdit = 0,
@@ -370,8 +371,22 @@ export async function contextMenu(node: PackageNode | ClassNode | RoutineNode): 
 }
 
 export async function fireOtherStudioAction(action: OtherStudioAction, uri?: vscode.Uri) {
-  const studioActions = new StudioActions(uri);
-  return studioActions && studioActions.fireOtherStudioAction(action);
+  if(studioExtensionEnabled) {
+    const studioActions = new StudioActions(uri);
+    return studioActions && studioActions.fireOtherStudioAction(action);
+  }
+}
+
+export function checkIfExtensionEnabled(): Promise<boolean> {
+  const api = new AtelierAPI();
+  const query = "select %Atelier_v1_Utils.Extension_ExtensionEnabled()";
+  return api.actionQuery(query, [])
+    .then(data => data.result.content.pop().Expression_1)
+    .then(extensionFound => {
+      studioExtensionEnabled = extensionFound;
+      vscode.commands.executeCommand("setContext", "vscode-objectscript.studioExtensionEnabled", extensionFound);
+      return extensionFound;
+    });
 }
 
 function getOtherStudioActionLabel(action: OtherStudioAction): string {
