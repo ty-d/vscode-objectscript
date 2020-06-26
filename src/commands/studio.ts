@@ -291,18 +291,29 @@ class StudioActions {
       .then(action => this.userAction(action));
   }
 
-  public fireOtherStudioAction(action: OtherStudioAction) {
+  public fireOtherStudioAction(action: OtherStudioAction, userAction?) {
     const actionObject = {
       id: action.toString(),
       label: getOtherStudioActionLabel(action)
     };
-    if(action === OtherStudioAction.AttemptedEdit) {
+    if (action === OtherStudioAction.AttemptedEdit) {
       const query = "select * from %Atelier_v1_Utils.Extension_GetStatus(?)";
-      this.api.actionQuery(query, [this.name]).then(statusObj => {
+      this.api.actionQuery(query, [this.name]).then((statusObj) => {
         const docStatus = statusObj.result.content.pop();
-        if(!docStatus.editable) {
-          vscode.commands.executeCommand('undo');
+        if (!docStatus.editable) {
+          vscode.commands.executeCommand("undo");
           this.userAction(actionObject, false, "", "", 1);
+        }
+      });
+    } else if (action === OtherStudioAction.DeletedDocument) {
+      if (!userAction) {
+        throw new Error("Deleted document action must be called with the action provided by the Atelier API.");
+      }
+      this.processUserAction(userAction).then((answer) => {
+        if (answer) {
+          return answer.msg || answer.msg === ""
+            ? this.userAction(action, true, answer.answer, answer.msg, 1)
+            : this.userAction(action, true, answer, "", 1);
         }
       });
     } else {
@@ -359,9 +370,9 @@ export async function contextMenu(node: PackageNode | ClassNode | RoutineNode): 
   return studioActions && studioActions.getMenu("", true);
 }
 
-export async function fireOtherStudioAction(action: OtherStudioAction, uri?: vscode.Uri) {
+export async function fireOtherStudioAction(action: OtherStudioAction, uri?: vscode.Uri, userAction?) {
   const studioActions = new StudioActions(uri);
-  return studioActions && studioActions.fireOtherStudioAction(action);
+  return studioActions && studioActions.fireOtherStudioAction(action, userAction);
 }
 
 function getOtherStudioActionLabel(action: OtherStudioAction): string {
