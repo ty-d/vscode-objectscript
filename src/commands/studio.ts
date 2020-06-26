@@ -32,18 +32,25 @@ function getOtherStudioActionLabel(action: OtherStudioAction): string {
   switch (action) {
     case OtherStudioAction.AttemptedEdit:
       label = "Attempted Edit";
+      break;
     case OtherStudioAction.CreatedNewDocument:
       label = "Created New Document";
+      break;
     case OtherStudioAction.DeletedDocument:
       label = "Deleted Document";
+      break;
     case OtherStudioAction.OpenedDocument:
       label = "Opened Document";
+      break;
     case OtherStudioAction.ClosedDocument:
       label = "Closed Document";
+      break;
     case OtherStudioAction.ConnectedToNewNamespace:
       label = "Changed Namespace";
+      break;
     case OtherStudioAction.FirstTimeDocumentSave:
       label = "Saved Document to Server for the First Time";
+      break;
   }
   /* eslint-enable no-fallthrough */
   return label;
@@ -335,9 +342,13 @@ class StudioActions {
       }
       this.processUserAction(userAction).then((answer) => {
         if (answer) {
+          const deleteAction = {
+            id: OtherStudioAction.DeletedDocument,
+            label: getOtherStudioActionLabel(OtherStudioAction.DeletedDocument)
+          };
           return answer.msg || answer.msg === ""
-            ? this.userAction(action, true, answer.answer, answer.msg, 1)
-            : this.userAction(action, true, answer, "", 1);
+            ? this.userAction(deleteAction, true, answer.answer, answer.msg, 1)
+            : this.userAction(deleteAction, true, answer, "", 1);
         }
       });
     } else {
