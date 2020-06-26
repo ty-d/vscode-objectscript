@@ -17,7 +17,6 @@ function deleteList(items: string[], workspaceFolder: string): Promise<any> {
 
   const api = new AtelierAPI();
   api.setConnection(workspaceFolder);
-<<<<<<< HEAD
   return Promise.all(items.map((item) => api.deleteDoc(item))).then((files) => {
     // Trigger the server's response from the delete
     // user action, which is provided in file.result.ext
@@ -25,15 +24,9 @@ function deleteList(items: string[], workspaceFolder: string): Promise<any> {
       const uri = DocumentContentProvider.getUri(file.result.name);
       fireOtherStudioAction(OtherStudioAction.DeletedDocument, uri, file.result.ext);
     });
-    outputChannel.appendLine(`Deleted items: ${files.filter(el => el.result).length}`);
-    const failed = files.filter((el) => !el.result).map((el) => `${el.file} - ${el.error}`);
-    if (files.find((el) => !el.result)) {
-=======
-  return Promise.all(items.map((item) => api.deleteDoc(item))).then((files) => {
     outputChannel.appendLine(`Deleted items: ${files.filter((el) => el.result).length}`);
     const failed = files.filter((el) => !el.result).map((el) => `${el.file} - ${el.error}`);
     if (files.find((el) => !el.result)) {
->>>>>>> master
       outputChannel.appendLine(`Items failed to delete: \n${failed.join("\n")}`);
     }
   });
